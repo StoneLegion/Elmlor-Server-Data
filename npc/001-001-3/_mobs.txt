@@ -1,0 +1,15 @@
+// This file is generated automatically. All manually changes will be removed when running the Converter.
+// Cave mobs
+
+001-001-3.gat,47,32,41,26|monster|Maggot|1002,10,60000,60000,Mob001-001-3::On1002
+
+
+001-001-3.gat,0,0,0|script|Mob001-001-3|-1,
+{
+    end;
+
+On1002:
+    set @mobID, 1002;
+    callfunc "MobPoints";
+    end;
+}

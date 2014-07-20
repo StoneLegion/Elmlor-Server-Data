@@ -1,0 +1,4 @@
+// This file is generated automatically. All manually changes will be removed when running the Converter.
+// Cave warps
+
+001-001-3.gat,41,51|warp|To Spawn|2,-1,001-001-1.gat,30,19

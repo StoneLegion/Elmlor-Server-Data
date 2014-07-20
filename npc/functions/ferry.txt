@@ -1,0 +1,116 @@
+// The ferry system
+
+017-9.gat,27,28,0|script|#FerryConfig|-1,
+{
+    end;
+
+OnInit:
+    disablenpc "Hurnscald Koga";
+    disablenpc "Candor Koga";
+    disablenpc "Nivalis Koga";
+    disablenpc "Tulimshar North Koga";
+    disablenpc "Tulimshar South Koga";
+    set $@MainCurrentDock, 0;
+    set $@CandorCurrentDock, 0;
+    set $@DockTickCount, 0;
+    set $@DockLeaveCount, 1;
+    setarray $@MainDocks$, "Hurnscald", "Nivalis", "Tulimshar South";
+    setarray $@CandorDocks$, "Candor", "Tulimshar North";
+    cmdothernpc "#"+$@MainDocks$[$@MainCurrentDock]+"Dock", "Arrive";
+    cmdothernpc "#"+$@CandorDocks$[$@CandorCurrentDock]+"Dock", "Arrive";
+    initnpctimer;
+    end;
+
+L_NextDock:
+    set $@MainLastDock, $@MainCurrentDock;
+    set $@CandorLastDock, $@CandorCurrentDock;
+    set $@MainCurrentDock, $@MainCurrentDock + 1;
+    set $@CandorCurrentDock, $@CandorCurrentDock + 1;
+    if($@MainCurrentDock == getarraysize($@MainDocks$))
+        set $@MainCurrentDock, 0;
+    if($@CandorCurrentDock == getarraysize($@CandorDocks$))
+        set $@CandorCurrentDock, 0;
+    set $@DockTickCount, 0;
+    cmdothernpc "#"+$@MainDocks$[$@MainLastDock]+"Dock", "Warp";
+    cmdothernpc "#"+$@MainDocks$[$@MainCurrentDock]+"Dock", "Arrive";
+    cmdothernpc "#"+$@CandorDocks$[$@CandorLastDock]+"Dock", "Warp";
+    cmdothernpc "#"+$@CandorDocks$[$@CandorCurrentDock]+"Dock", "Arrive";
+    mapannounce "035-2.tmx", " Koga - Main : Now arriving in "+$@MainDocks$[$@MainCurrentDock]+".", 0;
+    mapannounce "036-2.tmx", " Koga - Candor : Now arriving in "+$@CandorDocks$[$@CandorCurrentDock]+".", 0;
+    initnpctimer;
+    end;
+
+OnTimer10000:
+    if ($@DockTickCount > $@DockLeaveCount)
+        goto L_NextDock;
+    mapannounce "035-2.tmx", "Koga - Main : Now docked in "+$@MainDocks$[$@MainCurrentDock]+", Departing soon", 0;
+    mapannounce "036-2.tmx", "Koga - Candor : Now docked in "+$@CandorDocks$[$@CandorCurrentDock]+", Departing soon", 0;
+    set $@DockTickCount, $@DockTickCount + 1;
+    initnpctimer;
+    end;
+
+}
+
+function|script|FerryManifest|,
+{
+    mes "Which Ferry do you want to check the schedule for?";
+    menu
+        "World Ferry.", L_WorldFerry,
+        "Candor Ferry.", L_CandorFerry;
+
+L_CandorFerry:
+    mes "The ferry is currently at "+$@CandorDocks$[$@CandorCurrentDock];
+    next;
+    set @NextDock, ($@CandorCurrentDock + 1);
+    if(@NextDock == getarraysize($@CandorDocks$))
+        set @NextDock, 0;
+    mes "The ferry will be arriving at "+$@CandorDocks$[@NextDock]+" next";
+    goto L_Close;
+
+L_WorldFerry:
+    mes "The ferry is currently at "+$@MainDocks$[$@MainCurrentDock];
+    next;
+    set @NextDock, ($@MainCurrentDock + 1);
+    if(@NextDock == getarraysize($@MainDocks$))
+        set @NextDock, 0;
+    mes "The ferry will be arriving at "+$@MainDocks$[@NextDock]+" next";
+    goto L_Close;
+
+L_Close:
+    close;
+}
+
+function|script|BoardFerry|,
+{
+    mes "Board the ferry?";
+    menu
+        "yes.", L_Board,
+        "no.", L_Return;
+
+L_Board:
+    warp "035-2.tmx",39,29;
+    goto L_Return;
+
+L_Return:
+    return;
+}
+
+function|script|BoardCandorFerry|,
+{
+    mes "Board the ferry?";
+    menu
+        "yes.", L_Board,
+        "no.", L_Return;
+
+L_Board:
+    if (BaseLevel < 40) goto L_TooYoung;
+    warp "036-2.tmx",39,29;
+    goto L_Return;
+
+L_TooYoung:
+    mes "This area is too dangerous for your low level.";
+    goto L_Return;
+
+L_Return:
+    return;
+}
