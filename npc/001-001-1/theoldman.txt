@@ -1,0 +1,61 @@
+//First Quest, Help The Old Man get his Maggot Slime for his burn.
+001-001-1.gat,27,18,0|script|The Old Man|116,
+{
+    set @state, ((QUEST_TheOldManSlime & NIBBLE_0_MASK) >> NIBBLE_0_SHIFT);
+    if (@state >= 2) goto L_Done;
+    if (@state == 1) goto L_Progress;
+    goto L_Start;
+
+L_Start:
+    mes "[The Old Man]";
+    mes "\"Hello there young one, I was injured when building this camp fire and ended up burning my hand. I was wondering if you would be willing to venture into the cave and get me some Slime from a Maggot. The Maggot Slime has healing properties that should help heal the burn.\"";
+    next;
+    mes "\"I will also give you this dagger to help you on your adventure through the cave.\"";
+    menu
+        "For a Dagger? Sure!", L_accept,
+        "Not today Gramps.", L_Close;
+
+L_accept:
+    mes "[The Old Man]";
+    mes "\"Thank you so much!  I'll wait here for you here.\"";
+    getitem "Dagger", 1;
+    set @state, 1;
+    callsub S_Update_Var;
+    close;
+
+L_Progress:
+    mes "[The Old Man]";
+    mes "\"Did you bring me the Maggot Slime that I asked for?\"";
+    next;
+    menu
+        "Yes, here you go.", L_try,
+        "Not yet, but I'll be back soon.", L_Close;
+
+L_try:
+    if (countitem("MaggotSlime") >= 1)
+        goto L_get;
+    mes "[The Old Man]";
+    mes "\"It doesn't look like you have gotten the Maggot Slime yet.\"";
+    goto L_Close;
+
+L_get:
+    delitem "MaggotSlime", 1;
+    set @state, 2;
+    callsub S_Update_Var;
+    mes "[The Old Man]";
+    mes "\"Thank you so much! I hope this will help heal the burn.\"";
+    goto L_Close;
+
+L_Done:
+    mes "[The Old Man]";
+    mes "\"Thanks again friend, the burn has been healing very nicely. Feel free to stay to stay at my house for the night, down the path to the South-East.\"";
+    goto L_Close;
+
+L_Close:
+    close;
+    
+S_Update_Var:
+    set QUEST_TheOldManSlime, (QUEST_TheOldManSlime & ~(NIBBLE_0_MASK) | (@state << NIBBLE_0_SHIFT));
+    return;
+
+}
