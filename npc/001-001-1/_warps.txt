@@ -1,4 +1,0 @@
-// This file is generated automatically. All manually changes will be removed when running the Converter.
-// Spawn Zone warps
-
-001-001-1.gat,29,17|warp|To Cave|1,0,001-001-3.gat,41,50
