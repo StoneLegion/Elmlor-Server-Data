@@ -1,0 +1,75 @@
+//First Quest, Help The Old Woman get his Maggot Slime for his burn.
+001-001-2.gat,25,22,0|script|The Old Woman|154,
+{
+    set @state, ((QUEST_TheOldManSlime & NIBBLE_0_MASK) >> NIBBLE_0_SHIFT);
+    if (@state >= 5) goto L_Done;
+    if (@state == 4) goto L_Killed;
+    if (@state == 3) goto L_Summon;
+    if (@state == 2) goto L_Start;
+    if (@state <= 1) goto L_Goaway;
+    goto L_Start;
+
+L_Goaway:
+    mes "[The Old Woman]";
+    mes "\"Hello there young one, Could you check on my husband up at the cave entrance?\"";
+    menu
+        "Sure", L_Close,
+        "Not today Grandma", L_Close;
+
+L_Start:
+    mes "[The Old Woman]";
+    mes "\"Thanks you for helping my husband out at the cave. I had no clue he had burned himself, but I'm really glad that you helped him.\"";
+    next;
+    mes "\"Where the heck are your clothes? I have some extras laying around here somewhere, would you like to have them?\"";
+    menu
+        "Yes Please!", L_accept,
+        "Thank you but maybe another time.", L_Close;
+
+L_accept:
+    mes "[The Old Woman]";
+    mes "\"Here you go young one.\"";
+    getitem "RaggedShorts", 1;
+    set @state, 3;
+    callsub S_Update_Var;
+    goto L_Summon;
+    
+L_Summon:
+    mes "\"What is that at the door!! Help!\"";
+    set @state, 4;
+    callsub S_Update_Var;
+    monster "001-001-2.gat", 27, 25, "MotherSlime", 2000, 1;
+    close;
+    
+L_Killed:
+    if (countitem("MotherSlime") < 1)
+    goto L_NotDone;
+    set @state, 5;
+    callsub S_Update_Var;
+    delitem "MotherSlime", 1;
+    getitem 15000, 1;
+    mes "[The Old Woman]";
+    mes "\"You killed it! I wish I had more to give, but please accept this Ragged Shirt To Match Your Pants.\"";
+    goto L_Close;
+    
+
+L_Done:
+    mes "[The Old Woman]";
+    mes "\"Thanks again for saving me!\"";
+    goto L_Close;
+    
+L_NotDone:
+    set @state, 3;
+    callsub S_Update_Var;
+    itemheal -Hp, 0;
+    mes "You die from a strange poison.";
+    goto L_Close;
+    
+    
+L_Close:
+    close;
+    
+S_Update_Var:
+    set QUEST_TheOldManSlime, (QUEST_TheOldManSlime & ~(NIBBLE_0_MASK) | (@state << NIBBLE_0_SHIFT));
+    return;
+
+}
