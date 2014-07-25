@@ -37,7 +37,7 @@ L_Summon:
     mes "\"What is that at the door!! Help!\"";
     set @state, 4;
     callsub S_Update_Var;
-    monster "001-001-2.gat", 27, 25, "MotherSlime", 2000, 1;
+    monster "001-001-2.gat", 27, 23, "MotherSlime", 2000, 1;
     close;
     
 L_Killed:
